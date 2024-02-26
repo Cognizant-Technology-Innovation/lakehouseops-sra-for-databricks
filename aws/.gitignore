@@ -12,6 +12,7 @@ aws/example.tvars
 
 # Crash log files
 crash.log
+crash.*.log
 
 # Ignore CLI configuration files
 .terraformrc terraform.rc
@@ -21,6 +22,8 @@ crash.log
 # version control.
 #
 *auto.tfvars
+*.tfvars
+*.tfvars.json
 
 # Ignore override files as they are usually used to override resources locally and so
 # are not checked in

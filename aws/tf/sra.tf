@@ -20,14 +20,14 @@ module "SRA" {
 
   // Account - general
   enable_logging_boolean = false // Logging configuration - set to false if a logging configuration currently exists
-  user_workspace_access  = ""
+  user_workspace_access  = "laurentjean.chindeko@cognizant.com"
 
   // Account - Unity Catalog:
   metastore_id            = null // Metastore configuration - leave null if there is no existing regional metastore, does not create a root storage location
   metastore_name          = join("", [var.resource_prefix, "-", var.region, "-", "uc"])
   data_bucket             = ""
-  workspace_catalog_admin = "" // Workspace specific catalogs are created, this user will become an admin of that catalog as an example
-  user_data_access        = ""
+  workspace_catalog_admin = "laurentjean.chindeko@cognizant.com" // Workspace specific catalogs are created, this user will become an admin of that catalog as an example
+  user_data_access        = "laurentjean.chindeko@cognizant.com"
 
   // Workspace - operation mode:
   operation_mode = "isolated" // Accepted values: standard, custom, firewall, or isolated

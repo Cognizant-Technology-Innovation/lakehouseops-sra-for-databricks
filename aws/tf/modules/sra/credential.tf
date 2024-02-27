@@ -8,6 +8,7 @@ data "databricks_aws_assume_role_policy" "this" {
 resource "aws_iam_role" "cross_account_role" {
   name               = "${var.resource_prefix}-crossaccount"
   assume_role_policy = data.databricks_aws_assume_role_policy.this.json
+  permissions_boundary = "arn:aws:iam::${var.aws_account_id}:policy/cloudboost_account_operator_boundary_policy"
   tags = {
     Name = "${var.resource_prefix}-crossaccount-role"
   }

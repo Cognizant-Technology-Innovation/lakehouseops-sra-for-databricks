@@ -94,6 +94,7 @@ data "databricks_aws_assume_role_policy" "log_delivery" {
 resource "aws_iam_role" "log_delivery" {
   name               = "${var.resource_prefix}-log-delivery"
   description        = "(${var.resource_prefix}) Log Delivery Role"
+  permissions_boundary = "arn:aws:iam::${var.aws_account_id}:policy/cloudboost_account_operator_boundary_policy"
   assume_role_policy = data.databricks_aws_assume_role_policy.log_delivery.json
   tags = {
     Name = "${var.resource_prefix}-log-delivery-role"

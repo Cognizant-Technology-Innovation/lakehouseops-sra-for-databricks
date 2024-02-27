@@ -47,6 +47,7 @@ data "aws_iam_policy_document" "passrole_for_unity_catalog_catalog" {
 resource "aws_iam_role" "unity_catalog_role" {
   name               = "${var.resource_prefix}-unity-catalog-${var.workspace_id}"
   assume_role_policy = data.aws_iam_policy_document.passrole_for_unity_catalog_catalog.json
+  permissions_boundary = "arn:aws:iam::${var.aws_account_id}:policy/cloudboost_account_operator_boundary_policy"
   tags = {
     Name = "${var.resource_prefix}-unity-catalog"
   }

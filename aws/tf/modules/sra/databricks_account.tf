@@ -10,6 +10,7 @@ module "log_delivery" {
 
   databricks_account_id = var.databricks_account_id
   resource_prefix       = var.resource_prefix
+  aws_account_id        = var.aws_account_id
 }
 
 

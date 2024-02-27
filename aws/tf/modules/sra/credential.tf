@@ -43,7 +43,7 @@ resource "aws_iam_role_policy" "cross_account" {
           "ec2:DescribeVpcs",
           "ec2:CreateTags",
           "ec2:DeleteTags",
-          "ec2:RequestSpotInstances"
+          "ec2:RequestSpotInstances",
           "ec2:DescribeFleetHistory",
           "ec2:ModifyFleet",
           "ec2:DeleteFleets",

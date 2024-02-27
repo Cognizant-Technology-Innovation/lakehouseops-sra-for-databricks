@@ -5,3 +5,7 @@ variable "resource_prefix" {
 variable "databricks_account_id" {
   type = string
 }
+
+variable "aws_account_id" {
+  type = string
+}

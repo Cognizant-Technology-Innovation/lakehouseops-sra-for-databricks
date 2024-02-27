@@ -44,6 +44,20 @@ resource "aws_iam_role_policy" "cross_account" {
           "ec2:CreateTags",
           "ec2:DeleteTags",
           "ec2:RequestSpotInstances"
+          "ec2:DescribeFleetHistory",
+          "ec2:ModifyFleet",
+          "ec2:DeleteFleets",
+          "ec2:DescribeFleetInstances",
+          "ec2:DescribeFleets",
+          "ec2:CreateFleet",
+          "ec2:DeleteLaunchTemplate",
+          "ec2:GetLaunchTemplateData",
+          "ec2:CreateLaunchTemplate",
+          "ec2:DescribeLaunchTemplates",
+          "ec2:DescribeLaunchTemplateVersions",
+          "ec2:ModifyLaunchTemplate",
+          "ec2:DeleteLaunchTemplateVersions",
+          "ec2:CreateLaunchTemplateVersion"
         ],
         "Resource" : [
           "*"

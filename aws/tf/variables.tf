@@ -3,6 +3,11 @@ variable "aws_account_id" {
   type        = string
 }
 
+variable "aws_profile" {
+  description = "ID of the AWS account."
+  type        = string
+}
+
 variable "client_id" {
   description = "Client ID for authentication."
   type        = string

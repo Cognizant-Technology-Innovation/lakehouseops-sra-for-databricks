@@ -14,7 +14,7 @@ provider "aws" {
   region = var.region
   shared_config_files      = ["~/.aws/config"]
   shared_credentials_files = ["~/.aws/credentials"]
-  profile                  = "cti-datalab"
+  profile                  = var.aws_profile
   
   default_tags {
     tags = {

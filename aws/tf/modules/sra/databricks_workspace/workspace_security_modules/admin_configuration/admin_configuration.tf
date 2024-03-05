@@ -1,6 +1,6 @@
 // Terraform Documentation: https://registry.terraform.io/providers/databricks/databricks/latest/docs/resources/workspace_conf
 
-resource "databricks_workspace_conf" "this" {
+resource "databricks_workspace_conf" "just_config_map" {
   custom_config = {
     "enableResultsDownloading"      = "false",
     "enableNotebookTableClipboard"  = "false",

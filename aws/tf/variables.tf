@@ -120,3 +120,15 @@ variable "my_uc_catalog_name" {
 variable "my_uc_catalog_resource_name" {
   type = string
 }
+
+variable "user_workspace_access" {
+  type = string
+}
+
+variable "workspace_catalog_admin" {
+  type = string
+}
+
+variable "user_data_access" {
+  type = string
+}

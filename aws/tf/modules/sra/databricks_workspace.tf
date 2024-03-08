@@ -11,8 +11,8 @@ module "uc_catalog" {
   aws_account_id          = var.aws_account_id
   resource_prefix         = var.resource_prefix
   uc_catalog_name         = "${var.resource_prefix}-catalog-${module.databricks_mws_workspace.workspace_id}"
-  my_uc_catalog_name      = "lakehouseops_dev_sydney"
-  my_uc_catalog_resource_name = "lakehouseops-dev-sydney"
+  my_uc_catalog_name      = var.my_uc_catalog_name
+  my_uc_catalog_resource_name = var.my_uc_catalog_resource_name
   workspace_id            = module.databricks_mws_workspace.workspace_id
   workspace_catalog_admin = var.workspace_catalog_admin
 

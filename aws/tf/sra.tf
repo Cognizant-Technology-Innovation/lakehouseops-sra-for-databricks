@@ -20,17 +20,17 @@ module "SRA" {
 
   // Account - general
   enable_logging_boolean = true // Logging configuration - set to false if a logging configuration currently exists
-  user_workspace_access  = "laurentjean.chindeko@cognizant.com"
+  user_workspace_access  = var.user_workspace_access
 
   // Account - Unity Catalog:
   metastore_id            = null // Metastore configuration - leave null if there is no existing regional metastore, does not create a root storage location
   metastore_name          = join("", [var.resource_prefix, "-", var.region, "-", "uc"])
-  data_bucket             = "cts-datalab-ap-southeast-2-data-storage-001"
-  workspace_catalog_admin = "laurentjean.chindeko@cognizant.com" // Workspace specific catalogs are created, this user will become an admin of that catalog as an example
-  user_data_access        = "laurentjean.chindeko@cognizant.com"
+  data_bucket             = "${var.resource_prefix}-${var.region}-data-storage-001"
+  workspace_catalog_admin = var.workspace_catalog_admin // Workspace specific catalogs are created, this user will become an admin of that catalog as an example
+  user_data_access        = var.user_data_access
 
-  my_uc_catalog_name      = ""
-  my_uc_catalog_resource_name = ""
+  my_uc_catalog_name      = var.my_uc_catalog_name
+  my_uc_catalog_resource_name = var.my_uc_catalog_resource_name
 
   // Workspace - operation mode:
   operation_mode = "standard" // Accepted values: standard, custom, firewall, or isolated

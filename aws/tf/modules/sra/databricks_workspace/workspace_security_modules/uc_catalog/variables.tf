@@ -21,3 +21,11 @@ variable "uc_catalog_name" {
 variable "workspace_catalog_admin" {
   type = string
 }
+
+variable "my_uc_catalog_name" {
+  type = string
+}
+
+variable "my_uc_catalog_resource_name" {
+  type = string
+}

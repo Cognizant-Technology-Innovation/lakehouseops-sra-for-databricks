@@ -29,6 +29,9 @@ module "SRA" {
   workspace_catalog_admin = "laurentjean.chindeko@cognizant.com" // Workspace specific catalogs are created, this user will become an admin of that catalog as an example
   user_data_access        = "laurentjean.chindeko@cognizant.com"
 
+  my_uc_catalog_name      = ""
+  my_uc_catalog_resource_name = ""
+
   // Workspace - operation mode:
   operation_mode = "standard" // Accepted values: standard, custom, firewall, or isolated
 

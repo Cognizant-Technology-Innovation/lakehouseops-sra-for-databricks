@@ -260,3 +260,11 @@ variable "workspace_service_principal_name" {
   description = "Service principle name"
   type        = string
 }
+
+variable "my_uc_catalog_name" {
+  type = string
+}
+
+variable "my_uc_catalog_resource_name" {
+  type = string
+}

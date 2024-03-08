@@ -112,3 +112,11 @@ variable "scc_relay" {
     #"us-west-1" = ""
   }
 }
+
+variable "my_uc_catalog_name" {
+  type = string
+}
+
+variable "my_uc_catalog_resource_name" {
+  type = string
+}

@@ -163,3 +163,128 @@ resource "databricks_grant" "workspace_catalog" {
   principal  = var.workspace_catalog_admin
   privileges = ["ALL_PRIVILEGES"]
 }
+
+// -------------------------------------------------------------------------------------------
+
+
+// Unity Catalog Role
+resource "aws_iam_role" "uc_lakehouseops_dev_sydney_role" {
+  name               = "${var.my_uc_catalog_resource_name}-uc-${var.workspace_id}"
+  assume_role_policy = data.aws_iam_policy_document.passrole_for_unity_catalog_catalog.json
+  permissions_boundary = "arn:aws:iam::${var.aws_account_id}:policy/cloudboost_account_operator_boundary_policy"
+  tags = {
+    Name = "${var.my_uc_catalog_resource_name}-uc"
+  }
+}
+
+// Unity Catalog IAM Policy
+data "aws_iam_policy_document" "uc_lakehouseops_dev_sydney_iam_policy" {
+  statement {
+    actions = [
+      "s3:GetObject",
+      "s3:GetObjectVersion",
+      "s3:PutObject",
+      "s3:PutObjectAcl",
+      "s3:DeleteObject",
+      "s3:ListBucket",
+      "s3:GetBucketLocation"
+    ]
+
+    resources = [
+      "arn:aws:s3:::${var.my_uc_catalog_resource_name}-${var.workspace_id}/*",
+      "arn:aws:s3:::${var.my_uc_catalog_resource_name}-${var.workspace_id}"
+    ]
+
+    effect = "Allow"
+  }
+
+  statement {
+    actions   = ["sts:AssumeRole"]
+    resources = ["arn:aws:iam::${var.aws_account_id}:role/${var.my_uc_catalog_resource_name}-uc-${var.workspace_id}"]
+    effect    = "Allow"
+  }
+}
+
+// Unity Catalog Policy
+resource "aws_iam_role_policy" "lakehouseops_dev_sydney_uc" {
+  name   = "${var.my_uc_catalog_resource_name}-uc-policy-${var.workspace_id}"
+  role   = aws_iam_role.uc_lakehouseops_dev_sydney_role.id
+  policy = data.aws_iam_policy_document.uc_lakehouseops_dev_sydney_iam_policy.json
+}
+
+
+// Unity Catalog S3
+resource "aws_s3_bucket" "uc_lakehouseops_dev_sydney_bucket" {
+  bucket        = "${var.my_uc_catalog_resource_name}-${var.workspace_id}"
+  force_destroy = true
+  tags = {
+    Name = var.my_uc_catalog_name
+  }
+}
+
+resource "aws_s3_bucket_versioning" "uc_lakehouseops_dev_sydney_versioning" {
+  bucket = aws_s3_bucket.uc_lakehouseops_dev_sydney_bucket.id
+  versioning_configuration {
+    status = "Disabled"
+  }
+}
+
+resource "aws_s3_bucket_server_side_encryption_configuration" "uc_lakehouseops_dev_sydney_encryption" {
+  bucket = aws_s3_bucket.uc_lakehouseops_dev_sydney_bucket.bucket
+
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm = "AES256"
+    }
+  }
+}
+
+resource "aws_s3_bucket_public_access_block" "uc_lakehouseops_dev_sydney" {
+  bucket                  = aws_s3_bucket.uc_lakehouseops_dev_sydney_bucket.id
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+  depends_on              = [aws_s3_bucket.uc_lakehouseops_dev_sydney_bucket]
+}
+
+
+// Storage Credential lakehouseops_dev_sydney
+resource "databricks_storage_credential" "lakehouseops_dev_sydney_catalog_storage_credential" {
+  name = aws_iam_role.uc_lakehouseops_dev_sydney_role.name
+  aws_iam_role {
+    role_arn = aws_iam_role.uc_lakehouseops_dev_sydney_role.arn
+  }
+  depends_on = [aws_iam_role.uc_lakehouseops_dev_sydney_role, time_sleep.wait_30_seconds]
+}
+
+// External Location
+resource "databricks_external_location" "lakehouseops_dev_sydney_catalog_external_location" {
+  name            = var.my_uc_catalog_name
+  url             = "s3://${var.my_uc_catalog_resource_name}-${var.workspace_id}/catalog/"
+  credential_name = databricks_storage_credential.lakehouseops_dev_sydney_catalog_storage_credential.id
+  skip_validation = true
+  read_only       = false
+  comment         = "Managed by TF"
+}
+
+
+// Workspace Catalog
+resource "databricks_catalog" "lakehouseops_dev_sydney_catalog" {
+  name           = var.my_uc_catalog_name
+  comment        = "This catalog is for workspace - ${var.workspace_id}"
+  isolation_mode = "ISOLATED"
+  storage_root   = "s3://${var.my_uc_catalog_resource_name}-${var.workspace_id}/catalog/"
+  properties = {
+    purpose = "Catalog for workspace - ${var.workspace_id}"
+  }
+  depends_on = [databricks_external_location.lakehouseops_dev_sydney_catalog_external_location]
+}
+
+// Grant Admin Catalog Perms
+resource "databricks_grant" "lakehouseops_dev_sydney_catalog" {
+  catalog = databricks_catalog.lakehouseops_dev_sydney_catalog.name
+
+  principal  = var.workspace_catalog_admin
+  privileges = ["ALL_PRIVILEGES"]
+}

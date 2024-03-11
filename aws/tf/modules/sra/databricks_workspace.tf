@@ -40,16 +40,16 @@ module "uc_external_location" {
 }
 
 // Workspace Admin Configuration
-module "admin_configuration" {
-  source = "./databricks_workspace/workspace_security_modules/admin_configuration"
-  providers = {
-    databricks = databricks.created_workspace
-  }
-
-  depends_on = [
-    module.databricks_mws_workspace
-  ]
-}
+// module "admin_configuration" {
+//   source = "./databricks_workspace/workspace_security_modules/admin_configuration"
+//   providers = {
+//     databricks = databricks.created_workspace
+//   }
+// 
+//   depends_on = [
+//     module.databricks_mws_workspace
+//   ]
+// }
 
 // Token Management
 module "token_management" {

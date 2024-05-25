@@ -20,14 +20,14 @@ module "SRA" {
 
   // Account - general
   enable_logging_boolean = false // Logging configuration - set to true if you'd like to set-up billing and audit log delivery to an S3 bucket. System tables can be used as an alternative with no set-up.
-  user_workspace_admin   = null  // REQUIRED - Admin workspace user (e.g. firstname.lastname@company.com)
+  user_workspace_admin   = "sujoy.chatterjee@cognizant.com"  // REQUIRED - Admin workspace user (e.g. firstname.lastname@company.com)
 
   // Account - Unity Catalog:
   metastore_id            = null // Metastore configuration - leave null if there is no existing regional metastore, does not create a root storage location
   metastore_name          = join("", [var.resource_prefix, "-", var.region, "-", "uc"])
-  data_bucket             = null // REQUIRED - Existing S3 bucket name (e.g. data-bucket-s3-test)
-  workspace_catalog_admin = null // REQUIRED - Workspace specific catalogs are created, this user will become an admin of that catalog (e.g. firstname.lastname@company.com)
-  external_location_admin = null // REQUIRED - Read-only external location is created, this user will become an admin of that exteranl location (e.g. firstname.lastname@company.com)
+  data_bucket             = "" // REQUIRED - Existing S3 bucket name (e.g. data-bucket-s3-test)
+  workspace_catalog_admin = "sujoy.chatterjee@cognizant.com" // REQUIRED - Workspace specific catalogs are created, this user will become an admin of that catalog (e.g. firstname.lastname@company.com)
+  external_location_admin = "sujoy.chatterjee@cognizant.com" // REQUIRED - Read-only external location is created, this user will become an admin of that exteranl location (e.g. firstname.lastname@company.com)
 
   // Workspace - operation mode:
   operation_mode = "standard" // REQUIRED - Accepted values: standard, custom, firewall, or isolated. https://github.com/databricks/terraform-databricks-sra/blob/main/aws/tf/README.md#operation-mode

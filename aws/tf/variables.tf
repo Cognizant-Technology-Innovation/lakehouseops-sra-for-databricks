@@ -66,6 +66,11 @@ data "aws_availability_zones" "available" {
   state = "available"
 }
 
+variable "workspace_catalog_admin" {
+  description = "Admin of the Workspace Catalog."
+  type        = string
+}
+
 variable "workspace" {
   type = map(string)
   default = {

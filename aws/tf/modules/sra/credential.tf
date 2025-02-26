@@ -6,10 +6,11 @@ data "databricks_aws_assume_role_policy" "this" {
 }
 
 resource "aws_iam_role" "cross_account_role" {
-  name               = "${var.resource_prefix}-crossaccount"
+  name               = "${var.resource_prefix}-cross-account"
   assume_role_policy = data.databricks_aws_assume_role_policy.this.json
   tags = {
-    Name = "${var.resource_prefix}-crossaccount-role"
+    Name    = "${var.resource_prefix}-cross-account"
+    Project = var.resource_prefix
   }
 }
 
@@ -50,6 +51,31 @@ resource "aws_iam_role_policy" "cross_account" {
         ]
       },
       {
+        "Sid" : "FleetPermissions",
+        "Effect" : "Allow",
+        "Action" : [
+          "ec2:DescribeFleetHistory",
+          "ec2:ModifyFleet",
+          "ec2:DeleteFleets",
+          "ec2:DescribeFleetInstances",
+          "ec2:DescribeFleets",
+          "ec2:CreateFleet",
+          "ec2:DeleteLaunchTemplate",
+          "ec2:GetLaunchTemplateData",
+          "ec2:CreateLaunchTemplate",
+          "ec2:DescribeLaunchTemplates",
+          "ec2:DescribeLaunchTemplateVersions",
+          "ec2:ModifyLaunchTemplate",
+          "ec2:DeleteLaunchTemplateVersions",
+          "ec2:CreateLaunchTemplateVersion",
+          "ec2:AssignPrivateIpAddresses",
+          "ec2:GetSpotPlacementScores"
+        ],
+        "Resource" : [
+          "*"
+        ]
+      },
+      {
         "Sid" : "InstancePoolsSupport",
         "Effect" : "Allow",
         "Action" : [
@@ -78,21 +104,6 @@ resource "aws_iam_role_policy" "cross_account" {
         } }
       },
       {
-        "Sid" : "AllowEc2RunInstanceImagePerTag",
-        "Effect" : "Allow",
-        "Action" : "ec2:RunInstances",
-        "Resource" : [
-          "arn:aws:ec2:${var.region}:${var.aws_account_id}:image/*"
-        ],
-        "Condition" : {
-          "StringEquals" : {
-            "aws:ResourceTag/Vendor" : "Databricks",
-            "ec2:Owner" : "601306020600"
-          }
-        }
-      }
-      ,
-      {
         "Sid" : "AllowEc2RunInstancePerVPCid",
         "Effect" : "Allow",
         "Action" : "ec2:RunInstances",
@@ -120,15 +131,15 @@ resource "aws_iam_role_policy" "cross_account" {
         ]
       },
       {
-        "Sid": "DatabricksSuppliedImages",
-        "Effect": "Deny",
-        "Action": "ec2:RunInstances",
-        "Resource": [
+        "Sid" : "DatabricksSuppliedImages",
+        "Effect" : "Deny",
+        "Action" : "ec2:RunInstances",
+        "Resource" : [
           "arn:aws:ec2:*:*:image/*"
         ],
-        "Condition": {
-          "StringNotEquals": {
-            "ec2:Owner": "601306020600"
+        "Condition" : {
+          "StringNotEquals" : {
+            "ec2:Owner" : "601306020600"
           }
         }
       },

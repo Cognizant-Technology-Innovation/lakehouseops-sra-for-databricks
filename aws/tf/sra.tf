@@ -1,84 +1,38 @@
 module "SRA" {
   source = "./modules/sra"
-
   providers = {
     databricks.mws = databricks.mws
     aws            = aws
   }
 
-  // Authentication Variables
   databricks_account_id = var.databricks_account_id
   client_id             = var.client_id
   client_secret         = var.client_secret
   aws_account_id        = var.aws_account_id
   region                = var.region
   region_name           = var.region_name[var.region]
+  region_bucket_name    = var.region_bucket_name[var.region]
+  admin_user            = var.admin_user
+  resource_prefix       = var.resource_prefix
 
-  // Naming and tagging variables:
-  resource_prefix = var.resource_prefix
-  resource_owner  = var.resource_owner
+  // REQUIRED:
+  network_configuration = "isolated" // Network (custom or isolated), see README.md for more information.
+  metastore_exists      = false      // If a regional metastore exists set to true.
 
-  // Account - general
-  enable_logging_boolean = false // Logging configuration - set to true if you'd like to set-up billing and audit log delivery to an S3 bucket. System tables can be used as an alternative with no set-up.
-  user_workspace_admin   = null  // REQUIRED - Admin workspace user (e.g. firstname.lastname@company.com)
-
-  // Account - Unity Catalog:
-  metastore_id            = null // Metastore configuration - leave null if there is no existing regional metastore, does not create a root storage location
-  metastore_name          = join("", [var.resource_prefix, "-", var.region, "-", "uc"])
-  data_bucket             = null // REQUIRED - Existing S3 bucket name (e.g. data-bucket-s3-test)
-  workspace_catalog_admin = null // REQUIRED - Workspace specific catalogs are created, this user will become an admin of that catalog (e.g. firstname.lastname@company.com)
-  external_location_admin = null // REQUIRED - Read-only external location is created, this user will become an admin of that exteranl location (e.g. firstname.lastname@company.com)
-
-  // Workspace - operation mode:
-  operation_mode = "standard" // REQUIRED - Accepted values: standard, custom, firewall, or isolated. https://github.com/databricks/terraform-databricks-sra/blob/main/aws/tf/README.md#operation-mode
-
-  // Workspace - AWS non-networking variables:
-  dbfsname                         = join("", [var.resource_prefix, "-", var.region, "-", "dbfsroot"])
-  cmk_admin_arn                    = null  // If not provided, the root user of the AWS account is used
-  enable_cluster_boolean           = false // WARNING: Clusters will spin-up Databricks clusters and AWS EC2 instances
-  workspace_service_principal_name = "sra-example-sp"
-
-  // Workspace - networking variables (optional if using custom operation mode):
-  vpc_cidr_range           = "10.0.0.0/18"
-  private_subnets_cidr     = ["10.0.16.0/22", "10.0.24.0/22"]
-  privatelink_subnets_cidr = ["10.0.32.0/26", "10.0.32.64/26"]
-  public_subnets_cidr      = ["10.0.32.128/26", "10.0.32.192/26"]
-  availability_zones       = [data.aws_availability_zones.available.names[0], data.aws_availability_zones.available.names[1]]
+  // REQUIRED IF USING ISOLATED NETWORK:
+  vpc_cidr_range           = "10.0.0.0/18" // Please re-define the subsequent subnet ranges if the VPC CIDR range is updated.
+  private_subnets_cidr     = ["10.0.0.0/22", "10.0.4.0/22", "10.0.8.0/22"]
+  privatelink_subnets_cidr = ["10.0.28.0/26", "10.0.28.64/26", "10.0.28.128/26"]
+  availability_zones       = [data.aws_availability_zones.available.names[0], data.aws_availability_zones.available.names[1], data.aws_availability_zones.available.names[2]]
   sg_egress_ports          = [443, 2443, 3306, 6666, 8443, 8444, 8445, 8446, 8447, 8448, 8449, 8450, 8451]
-  sg_ingress_protocol      = ["tcp", "udp"]
-  sg_egress_protocol       = ["tcp", "udp"]
-  relay_vpce_service       = var.scc_relay[var.region]
-  workspace_vpce_service   = var.workspace[var.region]
 
-  // Workspace - networking variables (required if using custom operation mode):
-  custom_vpc_id             = null
-  custom_private_subnet_ids = null // list of strings required
-  custom_sg_id              = null
-  custom_relay_vpce_id      = null
-  custom_workspace_vpce_id  = null
+  // REQUIRED IF USING NON-ROOT ACCOUNT CMK ADMIN:
+  # cmk_admin_arn             = "arn:aws:iam::123456789012:user/CMKAdmin" // Example CMK ARN
 
-  // Workspace - networking variables (required if using firewall operation mode):
-  firewall_subnets_cidr       = ["10.0.33.0/26", "10.0.33.64/26"]
-  firewall_allow_list         = [".pypi.org", ".cran.r-project.org", ".pythonhosted.org", ".spark-packages.org", ".maven.org", "maven.apache.org", ".storage-download.googleapis.com"]
-  firewall_protocol_deny_list = "IP"
-  hive_metastore_fqdn         = "mdb7sywh50xhpr.chkweekm4xjq.us-east-1.rds.amazonaws.com" //
-
-  // Workspace - restrictive AWS asset policies (optional):
-  enable_restrictive_root_bucket_boolean      = false
-  enable_restrictive_s3_endpoint_boolean      = false
-  enable_restrictive_sts_endpoint_boolean     = false
-  enable_restrictive_kinesis_endpoint_boolean = false
-
-  // Workspace - IP access list (optional):
-  enable_ip_boolean = false
-  ip_addresses      = ["X.X.X.X", "X.X.X.X/XX", "X.X.X.X/XX"] // WARNING: Please validate that IPs entered are correct, recommend setting a break glass IP in case of a lockout
-
-  // Public Preview - System Tables Schemas (optional, if system tables audit log alerting is set to true and system table schemas are not enabled then it is required):
-  enable_system_tables_schema = false // WARNING: This feature is in public preview: https://docs.databricks.com/en/administration-guide/system-tables/index.html#enable-system-table-schemas
-
-  // Solution Accelerator - Security Analysis Tool (optional):
-  enable_sat_boolean = false // WARNING: Security analysis tool spins-up jobs and clusters. More information here: https://github.com/databricks-industry-solutions/security-analysis-tool/tree/main
-
-  // Solution Accelerator - Audit Logs Alerting (optional):
-  enable_audit_log_alerting = false // WARNING: Audit Logs Alerting spins-up jobs and clusters. More information here: https://github.com/andyweaves/system-tables-audit-logs/tree/main/terraform
+  // REQUIRED IF USING CUSTOM NETWORK:
+  # custom_vpc_id             = "vpc-0abc123456def7890" // Example VPC ID
+  # custom_private_subnet_ids = ["subnet-0123456789abcdef0", "subnet-0abcdef1234567890"] // Example private subnet IDs
+  # custom_sg_id              = "sg-0123456789abcdef0" // Example security group ID
+  # custom_relay_vpce_id      = "vpce-0abc123456def7890" // Example PrivateLink endpoint ID for Databricks relay
+  # custom_workspace_vpce_id  = "vpce-0abcdef1234567890" // Example PrivateLink endpoint ID for Databricks workspace
 }
